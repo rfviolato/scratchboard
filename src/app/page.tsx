@@ -1,9 +1,9 @@
-import { ReorderList } from "./ReorderList/ReorderList";
+import { MorphingText } from "./MorphingText/MorphingText";
 
 export default function Home() {
   return (
     <div className="flex items-center justify-center h-full">
-      <ReorderList />
+      <MorphingText initialText="Compile" endText="Code" />
     </div>
   );
 }
