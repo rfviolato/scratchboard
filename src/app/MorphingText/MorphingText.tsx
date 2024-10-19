@@ -1,15 +1,9 @@
 "use client";
 import { AnimatePresence, motion } from "framer-motion";
-import {
-  useEffect,
-  useState,
-  type PropsWithChildren,
-  type ReactNode,
-} from "react";
+import { type PropsWithChildren, type ReactNode } from "react";
 
 interface MorphingTextProps {
-  initialText: string;
-  endText: string;
+  text: string;
 }
 
 interface ChacacterContent {
@@ -36,27 +30,14 @@ function generateCharacterContent(text: string): ChacacterContent[] {
 }
 
 export function MorphingText({
-  initialText,
-  endText,
+  text,
 }: PropsWithChildren<MorphingTextProps>): ReactNode {
-  const [isEndTextDisplayed, setIsEndTextDisplayed] = useState(false);
-  const endTextCharacters = generateCharacterContent(endText);
-  const initialTextCharacters = generateCharacterContent(initialText);
-  const textContent = isEndTextDisplayed
-    ? endTextCharacters
-    : initialTextCharacters;
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setIsEndTextDisplayed((isEndTextDisplayed) => !isEndTextDisplayed);
-    }, 2000);
-
-    return () => clearInterval(interval);
-  }, []);
+  const characters = generateCharacterContent(text);
+  console.log(characters);
 
   return (
     <AnimatePresence initial={false} mode="popLayout">
-      {textContent.map(({ character, key }) => (
+      {characters.map(({ character, key }) => (
         <motion.span
           layoutId={key}
           key={key}
@@ -68,6 +49,7 @@ export function MorphingText({
             duration: 0.3,
             bounce: 0,
           }}
+          style={{ whiteSpace: "pre" }}
         >
           {character}
         </motion.span>
