@@ -1,5 +1,10 @@
 import { useEffect, useRef, type ReactNode } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import {
+  AnimatePresence,
+  motion,
+  useMotionValue,
+  useTransform,
+} from "framer-motion";
 import clsx from "clsx";
 
 interface FeedbackButtonProps {
@@ -24,8 +29,12 @@ export function FeedbackButton({
   onClick,
 }: FeedbackButtonProps): ReactNode {
   const progressInterval = useRef<ReturnType<typeof setInterval> | null>(null);
-  const progressRef = useRef<number>(0);
-  const progressElementRef = useRef<HTMLDivElement>(null);
+  const progress = useMotionValue(0);
+  const input = [0, 100];
+  const output = ["-100%", "0%"];
+  const translateX = useTransform(progress, input, output);
+  const isInDefaultState = !isSuccessful && !hasErrored && !isLoading;
+  const isDisabled = !isInDefaultState;
 
   function renderButtonText(): string {
     if (isSuccessful) {
@@ -43,23 +52,11 @@ export function FeedbackButton({
     return defaultText;
   }
 
-  /**
-   * TODO:
-   * - Try to leverage one of the frame-motion Motion values https://www.framer.com/motion/motionvalue/
-   * - Better randomize, with more chunks of the progress bar moving at once and never more than 100%
-   */
   useEffect(() => {
     if (isLoading) {
       progressInterval.current = setInterval(() => {
-        progressRef.current =
-          progressRef.current + Math.floor(Math.random() * 2) + 1;
-
-        if (progressElementRef.current) {
-          progressElementRef.current.style.transform = `translateX(${
-            progressRef.current - 100
-          }%)`;
-        }
-      }, 30);
+        progress.set(progress.get() + Math.floor(Math.random() * 10) + 1);
+      }, 130);
     }
 
     if (isSuccessful) {
@@ -67,23 +64,15 @@ export function FeedbackButton({
         clearInterval(progressInterval.current);
       }
 
-      progressRef.current = 100;
-
-      if (progressElementRef.current) {
-        progressElementRef.current.style.transform = "translateX(0%)";
-      }
+      progress.set(100);
     }
 
-    if (!isSuccessful && !hasErrored && !isLoading) {
+    if (isInDefaultState) {
       if (progressInterval.current) {
         clearInterval(progressInterval.current);
       }
 
-      progressRef.current = 0;
-
-      if (progressElementRef.current) {
-        progressElementRef.current.style.transform = "translateX(-100%)";
-      }
+      progress.set(0);
     }
 
     return () => {
@@ -91,10 +80,9 @@ export function FeedbackButton({
         clearInterval(progressInterval.current);
       }
     };
-  }, [isLoading, isSuccessful, hasErrored]);
+  }, [isInDefaultState, isLoading, progress, isSuccessful]);
 
   const text = renderButtonText();
-  const isDisabled = isLoading || isSuccessful;
 
   return (
     <div className="relative text-center">
@@ -123,10 +111,10 @@ export function FeedbackButton({
           animate={{ scaleY: isLoading ? 1 : 0, originY: 1 }}
           transition={{ duration: 0.3 }}
         >
-          <div
-            ref={progressElementRef}
+          <motion.div
+            style={{ x: translateX }}
             className="bg-slate-200 h-full w-full transition-transform -translate-x-full"
-          ></div>
+          ></motion.div>
         </motion.div>
       </motion.button>
 

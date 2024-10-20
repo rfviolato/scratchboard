@@ -56,22 +56,28 @@ export function FeedbackButtonShowcase(): ReactNode {
   }, []);
 
   return (
-    <div className="flex flex-col gap-8">
-      <FeedbackButton
-        {...buttonProps}
-        isSuccessful={successButtonState === "SUCCESS"}
-        hasErrored={successButtonState === "ERROR"}
-        isLoading={successButtonState === "LOADING"}
-        onClick={onSuccessButtonClick}
-      />
+    <div className="flex flex-col gap-12">
+      <div className="text-center">
+        <h1 className="font-bold text-2xl pb-2">Success state button</h1>
+        <FeedbackButton
+          {...buttonProps}
+          isSuccessful={successButtonState === "SUCCESS"}
+          hasErrored={successButtonState === "ERROR"}
+          isLoading={successButtonState === "LOADING"}
+          onClick={onSuccessButtonClick}
+        />
+      </div>
 
-      <FeedbackButton
-        {...buttonProps}
-        isSuccessful={errorButtonState === "SUCCESS"}
-        hasErrored={errorButtonState === "ERROR"}
-        isLoading={errorButtonState === "LOADING"}
-        onClick={onErrorButtonClick}
-      />
+      <div className="text-center">
+        <h1 className="font-bold text-2xl pb-2">Error state button</h1>
+        <FeedbackButton
+          {...buttonProps}
+          isSuccessful={errorButtonState === "SUCCESS"}
+          hasErrored={errorButtonState === "ERROR"}
+          isLoading={errorButtonState === "LOADING"}
+          onClick={onErrorButtonClick}
+        />
+      </div>
     </div>
   );
 }
