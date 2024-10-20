@@ -93,13 +93,14 @@ export function FeedbackButton({
   }, [isLoading, isSuccessful, hasErrored]);
 
   const text = renderButtonText();
+  const isDisabled = isLoading || isSuccessful;
 
   return (
     <div className="relative text-center">
       <motion.button
         layout
         className={clsx(
-          "px-4 h-[40px] transition-colors duration-300 overflow-hidden",
+          "px-6 h-[40px] transition-colors duration-500 overflow-hidden",
           {
             "bg-green-600": isSuccessful,
             "bg-red-600": hasErrored,
@@ -109,10 +110,10 @@ export function FeedbackButton({
             "cursor-default": isSuccessful,
           }
         )}
-        style={{ borderRadius: 8 }}
+        style={{ borderRadius: 4 }}
         onClick={onClick}
-        disabled={isLoading || isSuccessful}
-        whileTap={{ scale: 0.95, opacity: 0.9 }}
+        disabled={isDisabled}
+        whileTap={isDisabled ? {} : { scale: 0.95, opacity: 0.9 }}
       >
         <span className="opacity-0">{renderButtonText()}</span>
         <motion.div
