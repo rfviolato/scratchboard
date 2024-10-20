@@ -105,17 +105,19 @@ export function FeedbackButton({
             "bg-red-600": hasErrored,
             "bg-blue-600": !isSuccessful && !hasErrored,
             "bg-blue-800": isLoading,
+            "cursor-wait": isLoading,
+            "cursor-default": isSuccessful,
           }
         )}
         style={{ borderRadius: 8 }}
         onClick={onClick}
-        disabled={isLoading}
+        disabled={isLoading || isSuccessful}
         whileTap={{ scale: 0.95, opacity: 0.9 }}
       >
         <span className="opacity-0">{renderButtonText()}</span>
         <motion.div
           initial={false}
-          className="bg-slate-400 w-full h-[3px] absolute bottom-0 left-0"
+          className="bg-slate-400 w-full h-[2px] absolute bottom-0 left-0"
           animate={{ scaleY: isLoading ? 1 : 0, originY: 1 }}
           transition={{ duration: 0.3 }}
         >

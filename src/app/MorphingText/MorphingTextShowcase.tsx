@@ -8,15 +8,15 @@ import {
 } from "react";
 import { MorphingText } from "./MorphingText";
 
-interface MorphingTextContainerProps {
+interface MorphingTextShowcaseProps {
   initialText: string;
   endText: string;
 }
 
-export function MorphingTextContainer({
+export function MorphingTextShowcase({
   initialText,
   endText,
-}: PropsWithChildren<MorphingTextContainerProps>): ReactNode {
+}: PropsWithChildren<MorphingTextShowcaseProps>): ReactNode {
   const [isEndTextDisplayed, setIsEndTextDisplayed] = useState(false);
 
   useEffect(() => {

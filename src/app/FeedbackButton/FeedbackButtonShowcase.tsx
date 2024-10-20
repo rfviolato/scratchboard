@@ -5,7 +5,7 @@ import { FeedbackButton } from "./FeedbackButton";
 type ButtonState = "SUCCESS" | "ERROR" | "LOADING" | "DEFAULT";
 let timeout: ReturnType<typeof setTimeout> | null = null;
 
-export function FeedbackButtonContainer(): ReactNode {
+export function FeedbackButtonShowcase(): ReactNode {
   const [buttonState, setButtonState] = useState<ButtonState>("DEFAULT");
 
   function onButtonClick(): void {
