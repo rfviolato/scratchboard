@@ -13,8 +13,6 @@ interface FeedbackButtonProps {
   onClick: () => void;
 }
 
-let progressInterval: ReturnType<typeof setInterval>;
-
 export function FeedbackButton({
   defaultText,
   successText,
@@ -25,6 +23,7 @@ export function FeedbackButton({
   isLoading,
   onClick,
 }: FeedbackButtonProps): ReactNode {
+  const progressInterval = useRef<ReturnType<typeof setInterval> | null>(null);
   const progressRef = useRef<number>(0);
   const progressElementRef = useRef<HTMLDivElement>(null);
 
@@ -48,11 +47,10 @@ export function FeedbackButton({
    * TODO:
    * - Try to leverage one of the frame-motion Motion values https://www.framer.com/motion/motionvalue/
    * - Better randomize, with more chunks of the progress bar moving at once and never more than 100%
-   * - Error state
    */
   useEffect(() => {
     if (isLoading) {
-      progressInterval = setInterval(() => {
+      progressInterval.current = setInterval(() => {
         progressRef.current =
           progressRef.current + Math.floor(Math.random() * 2) + 1;
 
@@ -65,8 +63,8 @@ export function FeedbackButton({
     }
 
     if (isSuccessful) {
-      if (progressInterval) {
-        clearInterval(progressInterval);
+      if (progressInterval.current) {
+        clearInterval(progressInterval.current);
       }
 
       progressRef.current = 100;
@@ -76,10 +74,9 @@ export function FeedbackButton({
       }
     }
 
-    // Reset
     if (!isSuccessful && !hasErrored && !isLoading) {
-      if (progressInterval) {
-        clearInterval(progressInterval);
+      if (progressInterval.current) {
+        clearInterval(progressInterval.current);
       }
 
       progressRef.current = 0;
@@ -89,7 +86,11 @@ export function FeedbackButton({
       }
     }
 
-    return () => clearInterval(progressInterval);
+    return () => {
+      if (progressInterval.current) {
+        clearInterval(progressInterval.current);
+      }
+    };
   }, [isLoading, isSuccessful, hasErrored]);
 
   const text = renderButtonText();
@@ -129,7 +130,7 @@ export function FeedbackButton({
         </motion.div>
       </motion.button>
 
-      <div className="top-0 left-1/2 -translate-x-1/2 absolute pointer-events-none h-full w-[220px] flex flex-col items-center justify-center">
+      <div className="top-0 left-1/2 -translate-x-1/2 absolute pointer-events-none h-full w-[200px] flex flex-col items-center justify-center">
         <AnimatePresence initial={false} mode="popLayout">
           <motion.span
             key={text}

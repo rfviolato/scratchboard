@@ -3,41 +3,75 @@ import { useEffect, useState, type ReactNode } from "react";
 import { FeedbackButton } from "./FeedbackButton";
 
 type ButtonState = "SUCCESS" | "ERROR" | "LOADING" | "DEFAULT";
-let timeout: ReturnType<typeof setTimeout> | null = null;
+let successTimeout: ReturnType<typeof setTimeout> | null = null;
+let errorTimeout: ReturnType<typeof setTimeout> | null = null;
+
+const buttonProps = {
+  defaultText: "Submit",
+  successText: "Boom! Done",
+  errorText: "It didn't work out",
+  loadingText: "Hang on in there",
+};
 
 export function FeedbackButtonShowcase(): ReactNode {
-  const [buttonState, setButtonState] = useState<ButtonState>("DEFAULT");
+  const [successButtonState, setSuccessButtonState] =
+    useState<ButtonState>("DEFAULT");
+  const [errorButtonState, setErrorButtonState] =
+    useState<ButtonState>("DEFAULT");
 
-  function onButtonClick(): void {
-    setButtonState("LOADING");
+  function onSuccessButtonClick(): void {
+    setSuccessButtonState("LOADING");
 
-    timeout = setTimeout(() => {
-      setButtonState("SUCCESS");
+    successTimeout = setTimeout(() => {
+      setSuccessButtonState("SUCCESS");
 
-      timeout = setTimeout(() => {
-        setButtonState("DEFAULT");
+      successTimeout = setTimeout(() => {
+        setSuccessButtonState("DEFAULT");
+      }, 2000);
+    }, 2000);
+  }
+
+  function onErrorButtonClick(): void {
+    setErrorButtonState("LOADING");
+
+    errorTimeout = setTimeout(() => {
+      setErrorButtonState("ERROR");
+
+      errorTimeout = setTimeout(() => {
+        setErrorButtonState("DEFAULT");
       }, 2000);
     }, 2000);
   }
 
   useEffect(() => {
     return () => {
-      if (timeout) {
-        clearTimeout(timeout);
+      if (successTimeout) {
+        clearTimeout(successTimeout);
+      }
+
+      if (errorTimeout) {
+        clearTimeout(errorTimeout);
       }
     };
   }, []);
 
   return (
-    <FeedbackButton
-      defaultText="Submit"
-      successText="Boom! Done"
-      isSuccessful={buttonState === "SUCCESS"}
-      errorText="It didn't work out"
-      hasErrored={buttonState === "ERROR"}
-      loadingText="Hang on in there"
-      isLoading={buttonState === "LOADING"}
-      onClick={onButtonClick}
-    />
+    <div className="flex flex-col gap-8">
+      <FeedbackButton
+        {...buttonProps}
+        isSuccessful={successButtonState === "SUCCESS"}
+        hasErrored={successButtonState === "ERROR"}
+        isLoading={successButtonState === "LOADING"}
+        onClick={onSuccessButtonClick}
+      />
+
+      <FeedbackButton
+        {...buttonProps}
+        isSuccessful={errorButtonState === "SUCCESS"}
+        hasErrored={errorButtonState === "ERROR"}
+        isLoading={errorButtonState === "LOADING"}
+        onClick={onErrorButtonClick}
+      />
+    </div>
   );
 }
