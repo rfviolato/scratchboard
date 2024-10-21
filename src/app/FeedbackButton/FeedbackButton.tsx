@@ -15,6 +15,7 @@ interface FeedbackButtonProps {
   hasErrored: boolean;
   loadingText: string;
   isLoading: boolean;
+  isLayoutAnimationEnabled?: boolean;
   onClick: () => void;
 }
 
@@ -27,6 +28,7 @@ export function FeedbackButton({
   loadingText,
   isLoading,
   onClick,
+  isLayoutAnimationEnabled = true,
 }: FeedbackButtonProps): ReactNode {
   const progressInterval = useRef<ReturnType<typeof setInterval> | null>(null);
   const progress = useMotionValue(0);
@@ -85,9 +87,12 @@ export function FeedbackButton({
   const text = renderButtonText();
 
   return (
-    <div className="relative text-center">
+    <div
+      className="relative text-center"
+      key={isLayoutAnimationEnabled.toString()}
+    >
       <motion.button
-        layout
+        layout={isLayoutAnimationEnabled}
         className={clsx(
           "px-6 h-[40px] transition-colors duration-500 overflow-hidden",
           {
