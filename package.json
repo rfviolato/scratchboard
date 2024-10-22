@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@rfviolato/private-registry": "^1.0.0",
+    "@uidotdev/usehooks": "^2.4.1",
     "clsx": "^2.1.1",
     "framer-motion": "^11.11.8",
     "next": "14.2.15",
