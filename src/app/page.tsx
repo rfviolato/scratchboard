@@ -1,10 +1,11 @@
 "use client";
-import { FeedbackFormShowcase } from "./FeedbackForm/FeedbackFormShowcase";
+
+import { IOSAppOpenCloseShowcase } from "./IOSAppOpenClose/IOSAppOpenCloseShowcase";
 
 export default function Home() {
   return (
     <div className="flex items-center justify-center h-full">
-      <FeedbackFormShowcase />
+      <IOSAppOpenCloseShowcase />
     </div>
   );
 }

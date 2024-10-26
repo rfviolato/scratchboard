@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import "@rfviolato/private-registry/font-awesome-5/css/fontawesome.min.css";
 import "@rfviolato/private-registry/font-awesome-5/css/solid.min.css";
 import "@rfviolato/private-registry/font-awesome-5/css/regular.min.css";
+import "@rfviolato/private-registry/font-awesome-5/css/brands.min.css";
 import "./globals.css";
 
 const geistSans = localFont({
