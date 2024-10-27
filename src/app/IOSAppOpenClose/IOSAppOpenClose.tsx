@@ -2,7 +2,7 @@ import Image from "next/image";
 import { useClickAway } from "@uidotdev/usehooks";
 import clsx from "clsx";
 import { AnimatePresence, motion } from "framer-motion";
-import { useRef, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 
 export interface IOSApp {
   id: string;
