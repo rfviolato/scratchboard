@@ -2,7 +2,7 @@ import Image from "next/image";
 import { useClickAway } from "@uidotdev/usehooks";
 import clsx from "clsx";
 import { AnimatePresence, motion } from "framer-motion";
-import { useState, type ReactNode } from "react";
+import { useRef, useState, type ReactNode } from "react";
 
 export interface IOSApp {
   id: string;
@@ -17,6 +17,8 @@ interface IOSAppOpenCloseProps {
 
 export function IOSAppOpenClose({ apps }: IOSAppOpenCloseProps): ReactNode {
   const [openedApp, setOpenedApp] = useState<IOSApp | null>(null);
+  const [appOpenCloseAnimationDoneId, setAppOpenCloseAnimationDoneId] =
+    useState<IOSApp["id"] | null>(null);
   const ref = useClickAway<HTMLDivElement>(() => {
     setOpenedApp(null);
   });
@@ -37,19 +39,29 @@ export function IOSAppOpenClose({ apps }: IOSAppOpenCloseProps): ReactNode {
         {apps.map((app) => {
           const { id } = app;
           const isAppOpen = openedApp?.id === id;
+          const isAppAnimating = appOpenCloseAnimationDoneId === id;
 
           return (
             <div key={id} className="flex items-center justify-center">
-              <div className="relative">
+              <div
+                className="relative"
+                style={{ zIndex: isAppAnimating ? "20" : "10" }}
+              >
                 <motion.button
                   layoutId={`app-${id}`}
-                  onClick={() => setOpenedApp(app)}
+                  onClick={() => {
+                    setOpenedApp(app);
+                    setAppOpenCloseAnimationDoneId(app.id);
+                  }}
                   className="size-[48px]"
                   style={{ borderRadius: 10, backgroundColor: app.color }}
                   transition={{
                     type: "spring",
                     bounce: 0,
                     duration: CLOSE_DURATION,
+                  }}
+                  onLayoutAnimationComplete={() => {
+                    // setAppOpenCloseAnimationDoneId(null);
                   }}
                 ></motion.button>
                 <motion.div
@@ -65,9 +77,12 @@ export function IOSAppOpenClose({ apps }: IOSAppOpenCloseProps): ReactNode {
                     isAppOpen
                       ? {
                           opacity: 0,
-                          transition: { duration: CLOSE_DURATION / 3 },
+                          transition: { duration: CLOSE_DURATION / 6 },
                         }
-                      : { opacity: 1 }
+                      : {
+                          opacity: 1,
+                          transition: { delay: CLOSE_DURATION / 8 },
+                        }
                   }
                 >
                   <i className={clsx("text-3xl", app.icon)}></i>
@@ -92,6 +107,9 @@ export function IOSAppOpenClose({ apps }: IOSAppOpenCloseProps): ReactNode {
               transition: { duration: OPEN_DURATION / 4 },
             }}
             exit={{ opacity: 0 }}
+            onLayoutAnimationStart={() => {
+              setAppOpenCloseAnimationDoneId(openedApp.id);
+            }}
           >
             <div className="absolute left-0 top-[15%] flex justify-center w-full scale-[8] invisible">
               <motion.div
