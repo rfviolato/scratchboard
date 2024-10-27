@@ -15,14 +15,10 @@ interface IOSAppOpenCloseProps {
   apps: IOSApp[];
 }
 
-/**
-  TODO: Icon scaling like ios' animation
- */
-
 export function IOSAppOpenClose({ apps }: IOSAppOpenCloseProps): ReactNode {
-  const [selectedApp, setSelectedApp] = useState<IOSApp | null>(null);
+  const [openedApp, setOpenedApp] = useState<IOSApp | null>(null);
   const ref = useClickAway<HTMLDivElement>(() => {
-    setSelectedApp(null);
+    setOpenedApp(null);
   });
 
   return (
@@ -40,39 +36,75 @@ export function IOSAppOpenClose({ apps }: IOSAppOpenCloseProps): ReactNode {
       <div className="relative z-10 grid grid-cols-4 gap-4 items-center content-center">
         {apps.map((app) => {
           const { id } = app;
+          const isAppOpen = openedApp?.id === id;
 
           return (
             <div key={id} className="flex items-center justify-center">
-              <motion.button
-                layoutId={`app-${id}`}
-                onClick={() => setSelectedApp(app)}
-                className="bg-indigo-600 size-[48px]"
-                style={{ borderRadius: 10, backgroundColor: app.color }}
-                transition={{
-                  type: "spring",
-                  duration: CLOSE_DURATION,
-                  bounce: 0,
-                }}
-              >
-                <i className={clsx("text-3xl", app.icon)}></i>
-              </motion.button>
+              <div className="relative">
+                <motion.button
+                  layoutId={`app-${id}`}
+                  onClick={() => setOpenedApp(app)}
+                  className="size-[48px]"
+                  style={{ borderRadius: 10, backgroundColor: app.color }}
+                  transition={{
+                    type: "spring",
+                    bounce: 0,
+                    duration: CLOSE_DURATION,
+                  }}
+                ></motion.button>
+                <motion.div
+                  key={`app-icon-${id}`}
+                  layoutId={`app-icon-${id}`}
+                  className="pointer-events-none absolute top-0 left-0 size-[48px] flex items-center justify-center"
+                  transition={{
+                    type: "spring",
+                    bounce: 0,
+                    duration: CLOSE_DURATION,
+                  }}
+                  animate={
+                    isAppOpen
+                      ? {
+                          opacity: 0,
+                          transition: { duration: CLOSE_DURATION / 3 },
+                        }
+                      : { opacity: 1 }
+                  }
+                >
+                  <i className={clsx("text-3xl", app.icon)}></i>
+                </motion.div>
+              </div>
             </div>
           );
         })}
       </div>
 
       <AnimatePresence initial={false}>
-        {selectedApp && (
+        {openedApp && (
           <motion.div
             key="app-content"
-            layoutId={`app-${selectedApp.id}`}
-            className="absolute z-20 top-0 left-0 size-full bg-gray-200 p-8 text-black"
+            layoutId={`app-${openedApp.id}`}
+            className="absolute z-10 top-0 left-0 size-full p-8 text-black bg-white"
             transition={{ type: "spring", duration: OPEN_DURATION, bounce: 0 }}
-            style={{ borderRadius: 48, backgroundColor: "white" }}
+            style={{ borderRadius: 48 }}
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1, transition: { duration: 0.2 } }}
-            exit={{ opacity: 0, transition: { delay: 0.05 } }}
+            animate={{
+              opacity: 1,
+              transition: { duration: OPEN_DURATION / 4 },
+            }}
+            exit={{ opacity: 0 }}
           >
+            <div className="absolute left-0 top-[15%] flex justify-center w-full scale-[8] invisible">
+              <motion.div
+                layoutId={`app-icon-${openedApp.id}`}
+                transition={{
+                  type: "spring",
+                  bounce: 0,
+                  duration: OPEN_DURATION,
+                }}
+              >
+                <i className={clsx("text-3xl", openedApp.icon)}></i>
+              </motion.div>
+            </div>
             <p>
               Lorem ipsum dolor, sit amet consectetur adipisicing elit. Magnam
               voluptatum est ipsum temporibus repellendus officia iusto. Ipsum,
@@ -96,5 +128,5 @@ export function IOSAppOpenClose({ apps }: IOSAppOpenCloseProps): ReactNode {
   );
 }
 
-const OPEN_DURATION = 0.45;
-const CLOSE_DURATION = 0.375;
+const OPEN_DURATION = 0.5;
+const CLOSE_DURATION = 0.4;
