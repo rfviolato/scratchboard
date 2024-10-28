@@ -60,9 +60,6 @@ export function IOSAppOpenClose({ apps }: IOSAppOpenCloseProps): ReactNode {
                     bounce: 0,
                     duration: CLOSE_DURATION,
                   }}
-                  onLayoutAnimationComplete={() => {
-                    // setAppOpenCloseAnimationDoneId(null);
-                  }}
                 ></motion.button>
                 <motion.div
                   key={`app-icon-${id}`}
@@ -77,7 +74,10 @@ export function IOSAppOpenClose({ apps }: IOSAppOpenCloseProps): ReactNode {
                     isAppOpen
                       ? {
                           opacity: 0,
-                          transition: { duration: CLOSE_DURATION / 6 },
+                          transition: {
+                            duration: CLOSE_DURATION / 2,
+                            delay: CLOSE_DURATION / 8,
+                          },
                         }
                       : {
                           opacity: 1,
@@ -104,9 +104,18 @@ export function IOSAppOpenClose({ apps }: IOSAppOpenCloseProps): ReactNode {
             initial={{ opacity: 0 }}
             animate={{
               opacity: 1,
-              transition: { duration: OPEN_DURATION / 4 },
+              transition: {
+                duration: OPEN_DURATION / 6,
+                delay: OPEN_DURATION / 10,
+              },
             }}
-            exit={{ opacity: 0 }}
+            exit={{
+              opacity: 0,
+              transition: {
+                duration: OPEN_DURATION / 4,
+                delay: OPEN_DURATION / 10,
+              },
+            }}
             onLayoutAnimationStart={() => {
               setAppOpenCloseAnimationDoneId(openedApp.id);
             }}
@@ -123,13 +132,14 @@ export function IOSAppOpenClose({ apps }: IOSAppOpenCloseProps): ReactNode {
                 <i className={clsx("text-3xl", openedApp.icon)}></i>
               </motion.div>
             </div>
-            <p>
+            <h1 className="text-4xl">App content</h1>
+            <p className="mt-4">
               Lorem ipsum dolor, sit amet consectetur adipisicing elit. Magnam
               voluptatum est ipsum temporibus repellendus officia iusto. Ipsum,
               dicta! Ea labore harum ut adipisci omnis reiciendis unde neque
               sint delectus nihil?
             </p>
-            <p>
+            <p className="mt-2">
               Lorem ipsum dolor sit amet consectetur adipisicing elit. Magnam
               velit, iste quae ex quisquam reprehenderit. Dolore provident hic
               ratione, eos, sunt dolorum iusto velit earum dolorem corrupti
