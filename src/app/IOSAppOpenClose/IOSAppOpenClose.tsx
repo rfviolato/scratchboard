@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { useClickAway } from "@uidotdev/usehooks";
 import clsx from "clsx";
 import { AnimatePresence, motion } from "framer-motion";
@@ -24,18 +23,8 @@ export function IOSAppOpenClose({ apps }: IOSAppOpenCloseProps): ReactNode {
   });
 
   return (
-    <div
-      ref={ref}
-      className="relative w-[360px] h-[640px] bg-white rounded-[48px] p-8 text-white overflow-hidden bg-cover"
-    >
-      <Image
-        alt="bg"
-        src="/images/background.webp"
-        className="absolute top-0 left-0 object-cover"
-        width={360}
-        height={640}
-      />
-      <div className="relative z-10 grid grid-cols-4 gap-4 items-center content-center">
+    <div ref={ref} className="relative size-full">
+      <div className="relative z-10 grid grid-cols-4 gap-4 items-center content-center p-8">
         {apps.map((app) => {
           const { id } = app;
           const isAppOpen = openedApp?.id === id;

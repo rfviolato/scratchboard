@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { IOSApp, IOSAppOpenClose } from "./IOSAppOpenClose";
+import { IOSContainer } from "../IOSContainer/IOSContainer";
 
 const apps: IOSApp[] = [
   {
@@ -149,5 +150,9 @@ const apps: IOSApp[] = [
 ];
 
 export function IOSAppOpenCloseShowcase(): ReactNode {
-  return <IOSAppOpenClose apps={apps} />;
+  return (
+    <IOSContainer>
+      <IOSAppOpenClose apps={apps} />
+    </IOSContainer>
+  );
 }
