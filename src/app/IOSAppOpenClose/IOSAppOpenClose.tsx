@@ -1,7 +1,14 @@
 import { useClickAway } from "@uidotdev/usehooks";
 import clsx from "clsx";
-import { AnimatePresence, motion } from "framer-motion";
-import { useState, type ReactNode } from "react";
+import {
+  AnimatePresence,
+  motion,
+  useDragControls,
+  useMotionValue,
+  useSpring,
+  useTransform,
+} from "framer-motion";
+import { useRef, useState, type ReactNode } from "react";
 
 export interface IOSApp {
   id: string;
@@ -15,12 +22,26 @@ interface IOSAppOpenCloseProps {
 }
 
 export function IOSAppOpenClose({ apps }: IOSAppOpenCloseProps): ReactNode {
+  const openedAppYValue = useSpring(0);
+  const openedAppOriginYValue = useMotionValue(
+    DEFAULT_OPENE_APP_CONTAINER_ORIGIN_Y
+  );
+  const openedAppScaleTransform = useTransform(
+    openedAppYValue,
+    [0, -DRAG_CONSTRAINT_Y],
+    [1, 0.3]
+  );
+  const openedAppDragControl = useRef<HTMLDivElement>(null);
   const [openedApp, setOpenedApp] = useState<IOSApp | null>(null);
   const [appOpenCloseAnimationDoneId, setAppOpenCloseAnimationDoneId] =
     useState<IOSApp["id"] | null>(null);
   const ref = useClickAway<HTMLDivElement>(() => {
     setOpenedApp(null);
   });
+  const controls = useDragControls();
+  function startDraggingOpenedApp(event: React.PointerEvent<HTMLDivElement>) {
+    controls.start(event);
+  }
 
   return (
     <div ref={ref} className="relative size-full">
@@ -39,6 +60,10 @@ export function IOSAppOpenClose({ apps }: IOSAppOpenCloseProps): ReactNode {
                 <motion.button
                   layoutId={`app-${id}`}
                   onClick={() => {
+                    openedAppYValue.jump(0);
+                    openedAppOriginYValue.jump(
+                      DEFAULT_OPENE_APP_CONTAINER_ORIGIN_Y
+                    );
                     setOpenedApp(app);
                     setAppOpenCloseAnimationDoneId(app.id);
                   }}
@@ -85,11 +110,39 @@ export function IOSAppOpenClose({ apps }: IOSAppOpenCloseProps): ReactNode {
       <AnimatePresence initial={false}>
         {openedApp && (
           <motion.div
+            drag
+            dragListener={false}
+            dragControls={controls}
+            dragConstraints={openedAppDragControl}
+            dragSnapToOrigin
+            onDragStart={() => {
+              openedAppOriginYValue.set(1);
+            }}
+            onDrag={(_, eventInfo) => {
+              openedAppYValue.jump(eventInfo.offset.y, false);
+            }}
+            onDragEnd={(_, eventInfo) => {
+              if (eventInfo.offset.y < -200) {
+                openedAppOriginYValue.set(DEFAULT_OPENE_APP_CONTAINER_ORIGIN_Y);
+                setOpenedApp(null);
+              } else {
+                openedAppYValue.on("animationComplete", () => {
+                  openedAppOriginYValue.set(
+                    DEFAULT_OPENE_APP_CONTAINER_ORIGIN_Y
+                  );
+                });
+                openedAppYValue.set(0);
+              }
+            }}
             key="app-content"
             layoutId={`app-${openedApp.id}`}
             className="absolute z-10 top-0 left-0 size-full p-8 text-black bg-white"
             transition={{ type: "spring", duration: OPEN_DURATION, bounce: 0 }}
-            style={{ borderRadius: 48 }}
+            style={{
+              borderRadius: 48,
+              scale: openedAppScaleTransform,
+              originY: openedAppOriginYValue,
+            }}
             initial={{ opacity: 0 }}
             animate={{
               opacity: 1,
@@ -121,14 +174,14 @@ export function IOSAppOpenClose({ apps }: IOSAppOpenCloseProps): ReactNode {
                 <i className={clsx("text-3xl", openedApp.icon)}></i>
               </motion.div>
             </div>
-            <h1 className="text-4xl">App content</h1>
-            <p className="mt-4">
+            <h1 className="text-4xl select-none">App content</h1>
+            <p className="mt-4 select-none">
               Lorem ipsum dolor, sit amet consectetur adipisicing elit. Magnam
               voluptatum est ipsum temporibus repellendus officia iusto. Ipsum,
               dicta! Ea labore harum ut adipisci omnis reiciendis unde neque
               sint delectus nihil?
             </p>
-            <p className="mt-2">
+            <p className="mt-2 select-none">
               Lorem ipsum dolor sit amet consectetur adipisicing elit. Magnam
               velit, iste quae ex quisquam reprehenderit. Dolore provident hic
               ratione, eos, sunt dolorum iusto velit earum dolorem corrupti
@@ -138,6 +191,19 @@ export function IOSAppOpenClose({ apps }: IOSAppOpenCloseProps): ReactNode {
               quasi necessitatibus. Rem totam recusandae nesciunt aperiam
               suscipit ducimus! Adipisci.
             </p>
+
+            <div
+              ref={openedAppDragControl}
+              className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1/2 flex items-end justify-center z-50"
+              style={{ height: DRAG_CONSTRAINT_Y, touchAction: "none" }}
+            >
+              <div
+                onPointerDown={startDraggingOpenedApp}
+                className="h-8 w-full flex items-end justify-center"
+              >
+                <div className="h-1.5 bg-black w-[80%] rounded-xl mb-2.5"></div>
+              </div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -147,3 +213,5 @@ export function IOSAppOpenClose({ apps }: IOSAppOpenCloseProps): ReactNode {
 
 const OPEN_DURATION = 0.5;
 const CLOSE_DURATION = 0.4;
+const DEFAULT_OPENE_APP_CONTAINER_ORIGIN_Y = 0.5;
+const DRAG_CONSTRAINT_Y = 500;
