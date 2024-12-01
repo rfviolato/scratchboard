@@ -12,6 +12,8 @@ import {
 } from "framer-motion";
 import { useRef, useState, type ReactNode } from "react";
 import { AppFakeContent } from "./AppFakeContent";
+import DynamicIsland from "../DynamicIsland/DynamicIsland";
+import { useSetDynamicIslandView } from "../DynamicIsland/useSetDynamicIslandView";
 
 export interface IOSApp {
   id: string;
@@ -25,6 +27,7 @@ interface IOSAppOpenCloseProps {
 }
 
 export function IOSAppOpenClose({ apps }: IOSAppOpenCloseProps): ReactNode {
+  const { dynamicIslandView } = useSetDynamicIslandView();
   const stopDragAnimationRef = useRef<AnimationPlaybackControls | null>(null);
   const openedAppYValue = useMotionValue(0);
   const openedAppOriginYValue = useMotionValue(
@@ -56,7 +59,11 @@ export function IOSAppOpenClose({ apps }: IOSAppOpenCloseProps): ReactNode {
 
   return (
     <div ref={ref} className="relative size-full">
-      <div className="relative z-10 grid grid-cols-4 gap-4 items-center content-center p-8">
+      <div className="absolute top-3 left-1/2 -translate-x-1/2 w-full">
+        <DynamicIsland view={dynamicIslandView} />
+      </div>
+
+      <div className="relative z-10 grid grid-cols-4 gap-4 items-center content-center p-8 pt-16">
         {apps.map((app) => {
           const { id } = app;
           const isAppOpen = openedApp?.id === id;
