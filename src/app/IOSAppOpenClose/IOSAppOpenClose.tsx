@@ -59,7 +59,7 @@ export function IOSAppOpenClose({ apps }: IOSAppOpenCloseProps): ReactNode {
 
   return (
     <div ref={ref} className="relative size-full">
-      <div className="absolute top-3 left-1/2 -translate-x-1/2 w-full">
+      <div className="absolute top-3 left-1/2 -translate-x-1/2 w-full z-50">
         <DynamicIsland view={dynamicIslandView} />
       </div>
 
