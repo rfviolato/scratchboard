@@ -5,8 +5,10 @@ import {
   motion,
   useDragControls,
   useMotionValue,
-  useSpring,
+  useMotionValueEvent,
   useTransform,
+  animate,
+  AnimationPlaybackControls,
 } from "framer-motion";
 import { useRef, useState, type ReactNode } from "react";
 import { AppFakeContent } from "./AppFakeContent";
@@ -23,9 +25,10 @@ interface IOSAppOpenCloseProps {
 }
 
 export function IOSAppOpenClose({ apps }: IOSAppOpenCloseProps): ReactNode {
-  const openedAppYValue = useSpring(0);
+  const stopDragAnimationRef = useRef<AnimationPlaybackControls | null>(null);
+  const openedAppYValue = useMotionValue(0);
   const openedAppOriginYValue = useMotionValue(
-    DEFAULT_OPENE_APP_CONTAINER_ORIGIN_Y
+    DEFAULT_OPENED_APP_CONTAINER_ORIGIN_Y
   );
   const openedAppScaleTransform = useTransform(
     openedAppYValue,
@@ -37,12 +40,19 @@ export function IOSAppOpenClose({ apps }: IOSAppOpenCloseProps): ReactNode {
   const [appOpenCloseAnimationDoneId, setAppOpenCloseAnimationDoneId] =
     useState<IOSApp["id"] | null>(null);
   const ref = useClickAway<HTMLDivElement>(() => {
+    openedAppOriginYValue.set(DEFAULT_OPENED_APP_CONTAINER_ORIGIN_Y);
     setOpenedApp(null);
   });
   const controls = useDragControls();
   function startDraggingOpenedApp(event: React.PointerEvent<HTMLDivElement>) {
     controls.start(event);
   }
+
+  useMotionValueEvent(openedAppYValue, "change", (value) => {
+    if (value === 0) {
+      openedAppOriginYValue.set(DEFAULT_OPENED_APP_CONTAINER_ORIGIN_Y);
+    }
+  });
 
   return (
     <div ref={ref} className="relative size-full">
@@ -61,9 +71,9 @@ export function IOSAppOpenClose({ apps }: IOSAppOpenCloseProps): ReactNode {
                 <motion.button
                   layoutId={`app-${id}`}
                   onClick={() => {
-                    openedAppYValue.jump(0);
-                    openedAppOriginYValue.jump(
-                      DEFAULT_OPENE_APP_CONTAINER_ORIGIN_Y
+                    openedAppYValue.set(0);
+                    openedAppOriginYValue.set(
+                      DEFAULT_OPENED_APP_CONTAINER_ORIGIN_Y
                     );
                     setOpenedApp(app);
                     setAppOpenCloseAnimationDoneId(app.id);
@@ -112,27 +122,35 @@ export function IOSAppOpenClose({ apps }: IOSAppOpenCloseProps): ReactNode {
         {openedApp && (
           <motion.div
             drag
+            dragSnapToOrigin
+            dragMomentum={false}
             dragListener={false}
             dragControls={controls}
             dragConstraints={openedAppDragControl}
-            dragSnapToOrigin
+            dragTransition={{
+              power: 0.1,
+              bounceStiffness: 700,
+              bounceDamping: 35,
+            }}
             onDragStart={() => {
+              stopDragAnimationRef.current?.stop();
               openedAppOriginYValue.set(1);
             }}
             onDrag={(_, eventInfo) => {
-              openedAppYValue.jump(eventInfo.offset.y, false);
+              openedAppYValue.set(eventInfo.offset.y, false);
             }}
             onDragEnd={(_, eventInfo) => {
               if (eventInfo.offset.y < -200) {
-                openedAppOriginYValue.set(DEFAULT_OPENE_APP_CONTAINER_ORIGIN_Y);
+                openedAppOriginYValue.set(
+                  DEFAULT_OPENED_APP_CONTAINER_ORIGIN_Y
+                );
+
                 setOpenedApp(null);
               } else {
-                openedAppYValue.on("animationComplete", () => {
-                  openedAppOriginYValue.set(
-                    DEFAULT_OPENE_APP_CONTAINER_ORIGIN_Y
-                  );
+                stopDragAnimationRef.current = animate(openedAppYValue, 0, {
+                  type: "spring",
+                  bounce: 0,
                 });
-                openedAppYValue.set(0);
               }
             }}
             key="app-content"
@@ -199,5 +217,5 @@ export function IOSAppOpenClose({ apps }: IOSAppOpenCloseProps): ReactNode {
 
 const OPEN_DURATION = 0.5;
 const CLOSE_DURATION = 0.4;
-const DEFAULT_OPENE_APP_CONTAINER_ORIGIN_Y = 0.5;
+const DEFAULT_OPENED_APP_CONTAINER_ORIGIN_Y = 0.5;
 const DRAG_CONSTRAINT_Y = 500;
