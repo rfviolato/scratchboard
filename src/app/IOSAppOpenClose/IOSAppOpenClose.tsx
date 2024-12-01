@@ -157,6 +157,7 @@ export function IOSAppOpenClose({ apps }: IOSAppOpenCloseProps): ReactNode {
                 stopDragAnimationRef.current = animate(openedAppYValue, 0, {
                   type: "spring",
                   bounce: 0,
+                  duration: 0.2,
                 });
               }
             }}
