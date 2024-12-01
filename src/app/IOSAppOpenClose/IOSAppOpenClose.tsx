@@ -35,7 +35,7 @@ export function IOSAppOpenClose({ apps }: IOSAppOpenCloseProps): ReactNode {
   );
   const openedAppScaleTransform = useTransform(
     openedAppYValue,
-    [0, -DRAG_CONSTRAINT_Y],
+    [0, -DRAG_CONSTRAINT_Y / 4],
     [1, 0.3]
   );
   const openedAppDragControl = useRef<HTMLDivElement>(null);
@@ -136,7 +136,7 @@ export function IOSAppOpenClose({ apps }: IOSAppOpenCloseProps): ReactNode {
             dragConstraints={openedAppDragControl}
             dragTransition={{
               power: 0.1,
-              bounceStiffness: 700,
+              bounceStiffness: 300,
               bounceDamping: 35,
             }}
             onDragStart={() => {
@@ -157,7 +157,7 @@ export function IOSAppOpenClose({ apps }: IOSAppOpenCloseProps): ReactNode {
                 stopDragAnimationRef.current = animate(openedAppYValue, 0, {
                   type: "spring",
                   bounce: 0,
-                  duration: 0.2,
+                  duration: 0.35,
                 });
               }
             }}
