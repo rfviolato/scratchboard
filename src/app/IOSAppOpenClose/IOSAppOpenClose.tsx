@@ -36,7 +36,7 @@ export function IOSAppOpenClose({ apps }: IOSAppOpenCloseProps): ReactNode {
   );
   const openedAppScaleTransform = useTransform(
     openedAppYValue,
-    [0, -DRAG_CONSTRAINT_Y / 4],
+    [0, -DRAG_CONSTRAINT_Y],
     [1, 0.3]
   );
   const openedAppDragControl = useRef<HTMLDivElement>(null);
