@@ -9,7 +9,9 @@ export function DynamicIslandShowcase(): ReactNode {
   return (
     <div className="flex items-center justify-center size-[600px] bg-white">
       <div>
-        <DynamicIsland view={dynamicIslandView} />
+        <div className="h-[160px]">
+          <DynamicIsland view={dynamicIslandView} />
+        </div>
 
         <div className="flex justify-center gap-4">
           <button

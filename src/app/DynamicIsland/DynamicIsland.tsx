@@ -40,7 +40,7 @@ export default function DynamicIsland({ view }: DynamicIslandProps) {
   }
 
   return (
-    <div className="relative flex h-[160px] justify-center">
+    <div className="relative flex justify-center">
       <motion.div
         layout
         className="h-fit min-w-[90px] overflow-hidden bg-black"

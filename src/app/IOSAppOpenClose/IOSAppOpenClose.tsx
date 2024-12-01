@@ -27,7 +27,8 @@ interface IOSAppOpenCloseProps {
 }
 
 export function IOSAppOpenClose({ apps }: IOSAppOpenCloseProps): ReactNode {
-  const { dynamicIslandView } = useSetDynamicIslandView();
+  const { dynamicIslandView, setViewWithTransition } =
+    useSetDynamicIslandView();
   const stopDragAnimationRef = useRef<AnimationPlaybackControls | null>(null);
   const openedAppYValue = useMotionValue(0);
   const openedAppOriginYValue = useMotionValue(
@@ -47,8 +48,17 @@ export function IOSAppOpenClose({ apps }: IOSAppOpenCloseProps): ReactNode {
     setOpenedApp(null);
   });
   const controls = useDragControls();
+
   function startDraggingOpenedApp(event: React.PointerEvent<HTMLDivElement>) {
     controls.start(event);
+  }
+
+  function onRingButtonClick() {
+    if (dynamicIslandView === "idle") {
+      setViewWithTransition("ring");
+    } else {
+      setViewWithTransition("idle");
+    }
   }
 
   useMotionValueEvent(openedAppYValue, "change", (value) => {
@@ -62,6 +72,13 @@ export function IOSAppOpenClose({ apps }: IOSAppOpenCloseProps): ReactNode {
       <div className="absolute top-3 left-1/2 -translate-x-1/2 w-full z-50">
         <DynamicIsland view={dynamicIslandView} />
       </div>
+
+      <button
+        onClick={onRingButtonClick}
+        className="absolute top-16 left-0 h-10 w-2 bg-black rounded-tr-md rounded-br-md flex items-center justify-center z-20 cursor-pointer"
+      >
+        <div className="h-[80%] bg-yellow-800 w-[2px] rounded-md"></div>
+      </button>
 
       <div className="relative z-10 grid grid-cols-4 gap-4 items-center content-center p-8 pt-16">
         {apps.map((app) => {
