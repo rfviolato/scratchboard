@@ -86,12 +86,13 @@ export function IOSAppOpenClose({ apps }: IOSAppOpenCloseProps): ReactNode {
         <DynamicIsland view={dynamicIslandView} />
       </div>
 
-      <button
+      <motion.button
         onClick={onRingButtonClick}
         className="absolute top-16 left-0 h-10 w-2 bg-black rounded-tr-md rounded-br-md flex items-center justify-center z-20 cursor-pointer"
+        whileTap={{ x: -2 }}
       >
         <div className="h-[80%] bg-yellow-800 w-[2px] rounded-md"></div>
-      </button>
+      </motion.button>
 
       <div className="relative z-10 grid grid-cols-4 gap-4 items-center content-center p-8 pt-16">
         {apps.map((app) => {
