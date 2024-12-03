@@ -4,8 +4,7 @@ import { useMemo } from "react";
 import { AnimatePresence, motion, Target } from "framer-motion";
 import { Ring } from "./Ring";
 import { Timer } from "./Timer";
-
-type View = "ring" | "timer" | "idle";
+import { View } from "./types";
 
 interface DynamicIslandProps {
   view: View;
@@ -13,18 +12,18 @@ interface DynamicIslandProps {
 
 export default function DynamicIsland({ view }: DynamicIslandProps) {
   const content = useMemo(() => {
-    switch (view) {
+    switch (view.id) {
       case "ring":
-        return <Ring />;
+        return <Ring subView={view.subView} />;
       case "timer":
         return <Timer />;
-      case "idle":
+      case "default":
         return <div className="h-7" />;
     }
   }, [view]);
 
   function getTransitionTarget(): Target {
-    switch (view) {
+    switch (view.id) {
       case "ring":
         return { opacity: 0, scale: 0.5, y: 0, filter: "blur(5px)" };
       case "timer":
@@ -55,7 +54,7 @@ export default function DynamicIsland({ view }: DynamicIslandProps) {
       <div className="absolute left-1/2 top-0 flex h-[150px] w-[300px] -translate-x-1/2 items-start justify-center">
         <AnimatePresence initial={false} mode="popLayout">
           <motion.div
-            key={view}
+            key={view.id}
             initial={getTransitionTarget()}
             animate={{
               opacity: 1,

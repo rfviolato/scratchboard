@@ -1,6 +1,6 @@
 import { useState } from "react";
+import { View } from "./types";
 
-type View = "ring" | "timer" | "idle";
 let transitionInterval: ReturnType<typeof setTimeout> | null = null;
 
 interface SetDynamicIslandViewOutput {
@@ -9,7 +9,10 @@ interface SetDynamicIslandViewOutput {
 }
 
 export function useSetDynamicIslandView(): SetDynamicIslandViewOutput {
-  const [dynamicIslandView, setDynamicIslandView] = useState<View>("idle");
+  const [dynamicIslandView, setDynamicIslandView] = useState<View>({
+    id: "default",
+    subView: null,
+  });
 
   function setViewWithTransition(nextView: View) {
     if (nextView === dynamicIslandView) {
@@ -20,15 +23,27 @@ export function useSetDynamicIslandView(): SetDynamicIslandViewOutput {
       clearInterval(transitionInterval);
     }
 
-    if (nextView === "idle" || dynamicIslandView === "idle") {
+    if (nextView.id === "default" || dynamicIslandView.id === "default") {
       setDynamicIslandView(nextView);
 
       return;
     }
 
-    setDynamicIslandView("idle");
+    if (nextView.id !== dynamicIslandView.id) {
+      setDynamicIslandView({
+        id: "default",
+        subView: null,
+      });
 
-    transitionInterval = setTimeout(() => setDynamicIslandView(nextView), 500);
+      transitionInterval = setTimeout(
+        () => setDynamicIslandView(nextView),
+        500
+      );
+
+      return;
+    }
+
+    setDynamicIslandView(nextView);
   }
 
   return {

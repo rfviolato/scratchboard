@@ -27,6 +27,8 @@ interface IOSAppOpenCloseProps {
 }
 
 export function IOSAppOpenClose({ apps }: IOSAppOpenCloseProps): ReactNode {
+  const isSilentRef = useRef(false);
+  const viewTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { dynamicIslandView, setViewWithTransition } =
     useSetDynamicIslandView();
   const stopDragAnimationRef = useRef<AnimationPlaybackControls | null>(null);
@@ -54,11 +56,22 @@ export function IOSAppOpenClose({ apps }: IOSAppOpenCloseProps): ReactNode {
   }
 
   function onRingButtonClick() {
-    if (dynamicIslandView === "idle") {
-      setViewWithTransition("ring");
-    } else {
-      setViewWithTransition("idle");
+    isSilentRef.current = !isSilentRef.current;
+    setViewWithTransition({
+      id: "ring",
+      subView: isSilentRef.current ? "sound" : "silent",
+    });
+
+    if (viewTimeoutRef.current) {
+      clearTimeout(viewTimeoutRef.current);
     }
+
+    viewTimeoutRef.current = setTimeout(() => {
+      setViewWithTransition({
+        id: "default",
+        subView: null,
+      });
+    }, 1500);
   }
 
   useMotionValueEvent(openedAppYValue, "change", (value) => {
