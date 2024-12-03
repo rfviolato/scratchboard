@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 export function AppFakeContent(): ReactNode {
   return (
     <>
-      <h1 className="text-4xl select-none">App content</h1>
+      <h1 className="text-4xl select-none pt-6">App content</h1>
       <p className="mt-4 select-none">
         Lorem ipsum dolor, sit amet consectetur adipisicing elit. Magnam
         voluptatum est ipsum temporibus repellendus officia iusto. Ipsum, dicta!

@@ -12,6 +12,8 @@ import {
 } from "framer-motion";
 import { useRef, useState, type ReactNode } from "react";
 import { AppFakeContent } from "./AppFakeContent";
+import DynamicIsland from "../DynamicIsland/DynamicIsland";
+import { useSetDynamicIslandView } from "../DynamicIsland/useSetDynamicIslandView";
 
 export interface IOSApp {
   id: string;
@@ -25,6 +27,10 @@ interface IOSAppOpenCloseProps {
 }
 
 export function IOSAppOpenClose({ apps }: IOSAppOpenCloseProps): ReactNode {
+  const isSilentRef = useRef(false);
+  const viewTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { dynamicIslandView, setViewWithTransition } =
+    useSetDynamicIslandView();
   const stopDragAnimationRef = useRef<AnimationPlaybackControls | null>(null);
   const openedAppYValue = useMotionValue(0);
   const openedAppOriginYValue = useMotionValue(
@@ -44,8 +50,28 @@ export function IOSAppOpenClose({ apps }: IOSAppOpenCloseProps): ReactNode {
     setOpenedApp(null);
   });
   const controls = useDragControls();
+
   function startDraggingOpenedApp(event: React.PointerEvent<HTMLDivElement>) {
     controls.start(event);
+  }
+
+  function onRingButtonClick() {
+    isSilentRef.current = !isSilentRef.current;
+    setViewWithTransition({
+      id: "ring",
+      subView: isSilentRef.current ? "sound" : "silent",
+    });
+
+    if (viewTimeoutRef.current) {
+      clearTimeout(viewTimeoutRef.current);
+    }
+
+    viewTimeoutRef.current = setTimeout(() => {
+      setViewWithTransition({
+        id: "default",
+        subView: null,
+      });
+    }, 1500);
   }
 
   useMotionValueEvent(openedAppYValue, "change", (value) => {
@@ -56,7 +82,19 @@ export function IOSAppOpenClose({ apps }: IOSAppOpenCloseProps): ReactNode {
 
   return (
     <div ref={ref} className="relative size-full">
-      <div className="relative z-10 grid grid-cols-4 gap-4 items-center content-center p-8">
+      <div className="absolute top-3 left-1/2 -translate-x-1/2 w-full z-50">
+        <DynamicIsland view={dynamicIslandView} />
+      </div>
+
+      <motion.button
+        onClick={onRingButtonClick}
+        className="absolute top-16 left-0 h-10 w-2 bg-black rounded-tr-md rounded-br-md flex items-center justify-center z-20 cursor-pointer"
+        whileTap={{ x: -2 }}
+      >
+        <div className="h-[80%] bg-yellow-800 w-[2px] rounded-md"></div>
+      </motion.button>
+
+      <div className="relative z-10 grid grid-cols-4 gap-4 items-center content-center p-8 pt-16">
         {apps.map((app) => {
           const { id } = app;
           const isAppOpen = openedApp?.id === id;
@@ -129,7 +167,7 @@ export function IOSAppOpenClose({ apps }: IOSAppOpenCloseProps): ReactNode {
             dragConstraints={openedAppDragControl}
             dragTransition={{
               power: 0.1,
-              bounceStiffness: 700,
+              bounceStiffness: 300,
               bounceDamping: 35,
             }}
             onDragStart={() => {
@@ -150,6 +188,7 @@ export function IOSAppOpenClose({ apps }: IOSAppOpenCloseProps): ReactNode {
                 stopDragAnimationRef.current = animate(openedAppYValue, 0, {
                   type: "spring",
                   bounce: 0,
+                  duration: 0.35,
                 });
               }
             }}

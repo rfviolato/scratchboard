@@ -1,8 +1,9 @@
 "use client";
 
 import clsx from "clsx";
-import React, { useEffect, useState } from "react";
+import React, { ReactNode } from "react";
 import { AnimatePresence, motion, Variant } from "framer-motion";
+import { RingView } from "./types";
 
 const textVariant: Record<string, Variant> = {
   initial: { opacity: 0, scale: 0.25, filter: "blur(4px)" },
@@ -10,16 +11,12 @@ const textVariant: Record<string, Variant> = {
   exit: { opacity: 0, scale: 0.25, filter: "blur(4px)" },
 };
 
-export function Ring() {
-  const [isSilent, setIsSilent] = useState(false);
+interface RingProps {
+  subView: RingView["subView"];
+}
 
-  useEffect(() => {
-    const id = setTimeout(() => {
-      setIsSilent((s) => !s);
-    }, 2000);
-
-    return () => clearTimeout(id);
-  }, [isSilent]);
+export function Ring({ subView = "silent" }: RingProps): ReactNode {
+  const isSilent = subView === "silent";
 
   return (
     <motion.div
