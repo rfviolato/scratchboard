@@ -3,7 +3,11 @@
 import { AnimatePresence, motion, MotionConfig, Variant } from "framer-motion";
 import { useEffect, useState } from "react";
 
-export function Timer() {
+interface TimerProps {
+  onDismiss?(): void;
+}
+
+export function Timer({ onDismiss }: TimerProps) {
   const [isPaused, setIsPaused] = useState(false);
 
   return (
@@ -59,6 +63,7 @@ export function Timer() {
       <button
         aria-label="Exit"
         className="flex h-10 w-10 items-center justify-center rounded-full bg-[#3C3D3C] text-white transition-colors hover:bg-[#4A4B4A]"
+        onClick={onDismiss}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"

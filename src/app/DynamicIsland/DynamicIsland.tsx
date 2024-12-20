@@ -8,19 +8,20 @@ import { View } from "./types";
 
 interface DynamicIslandProps {
   view: View;
+  onDismiss?(): void;
 }
 
-export default function DynamicIsland({ view }: DynamicIslandProps) {
+export default function DynamicIsland({ view, onDismiss }: DynamicIslandProps) {
   const content = useMemo(() => {
     switch (view.id) {
       case "ring":
         return <Ring subView={view.subView} />;
       case "timer":
-        return <Timer />;
+        return <Timer onDismiss={onDismiss} />;
       case "default":
         return <div className="h-7" />;
     }
-  }, [view]);
+  }, [view, onDismiss]);
 
   function getTransitionTarget(): Target {
     switch (view.id) {
