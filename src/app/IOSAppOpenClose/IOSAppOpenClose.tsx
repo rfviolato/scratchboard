@@ -10,7 +10,7 @@ import {
   animate,
   AnimationPlaybackControls,
 } from "framer-motion";
-import { useRef, useState, type ReactNode } from "react";
+import { useCallback, useRef, useState, type ReactNode } from "react";
 import { AppFakeContent } from "./AppFakeContent";
 import DynamicIsland from "../DynamicIsland/DynamicIsland";
 import { useSetDynamicIslandView } from "../DynamicIsland/useSetDynamicIslandView";
@@ -20,6 +20,7 @@ export interface IOSApp {
   name: string;
   icon: string;
   color: string;
+  isDynamicIslandTrigger?: boolean;
 }
 
 interface IOSAppOpenCloseProps {
@@ -74,16 +75,53 @@ export function IOSAppOpenClose({ apps }: IOSAppOpenCloseProps): ReactNode {
     }, 1500);
   }
 
+  function onAppIconClick(app: IOSApp) {
+    if (app.isDynamicIslandTrigger) {
+      if (app.id === "timer") {
+        setViewWithTransition({
+          id: "timer",
+          subView: null,
+        });
+
+        return;
+      }
+
+      return;
+    }
+
+    openedAppYValue.set(0);
+    openedAppOriginYValue.set(DEFAULT_OPENED_APP_CONTAINER_ORIGIN_Y);
+    setOpenedApp(app);
+    setAppOpenCloseAnimationDoneId(app.id);
+  }
+
   useMotionValueEvent(openedAppYValue, "change", (value) => {
     if (value === 0) {
       openedAppOriginYValue.set(DEFAULT_OPENED_APP_CONTAINER_ORIGIN_Y);
     }
   });
 
+  const onDyanmicIslandDismiss = useCallback(() => {
+    setViewWithTransition({
+      id: "default",
+      subView: null,
+    });
+  }, [setViewWithTransition]);
+
   return (
     <div ref={ref} className="relative size-full">
-      <div className="absolute top-3 left-1/2 -translate-x-1/2 w-full z-50">
-        <DynamicIsland view={dynamicIslandView} />
+      <div
+        className={clsx(
+          "absolute top-3 left-1/2 -translate-x-1/2 w-full z-50",
+          {
+            "pointer-events-none": dynamicIslandView.id === "default",
+          }
+        )}
+      >
+        <DynamicIsland
+          view={dynamicIslandView}
+          onDismiss={onDyanmicIslandDismiss}
+        />
       </div>
 
       <motion.button
@@ -108,14 +146,7 @@ export function IOSAppOpenClose({ apps }: IOSAppOpenCloseProps): ReactNode {
               >
                 <motion.button
                   layoutId={`app-${id}`}
-                  onClick={() => {
-                    openedAppYValue.set(0);
-                    openedAppOriginYValue.set(
-                      DEFAULT_OPENED_APP_CONTAINER_ORIGIN_Y
-                    );
-                    setOpenedApp(app);
-                    setAppOpenCloseAnimationDoneId(app.id);
-                  }}
+                  onClick={() => onAppIconClick(app)}
                   className="size-[48px]"
                   style={{ borderRadius: 10, backgroundColor: app.color }}
                   transition={{

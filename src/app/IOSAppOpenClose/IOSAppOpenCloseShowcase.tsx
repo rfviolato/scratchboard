@@ -22,6 +22,13 @@ const apps: IOSApp[] = [
     color: "#25D366",
   },
   {
+    id: "timer",
+    name: "Timer",
+    icon: "far fa-stopwatch-20",
+    color: "#323232",
+    isDynamicIslandTrigger: true,
+  },
+  {
     id: "4",
     name: "Snapchat",
     icon: "fab fa-snapchat-ghost",
@@ -122,12 +129,6 @@ const apps: IOSApp[] = [
     name: "Twitch",
     icon: "fab fa-twitch",
     color: "#9146FF",
-  },
-  {
-    id: "21",
-    name: "Spotify for Artists",
-    icon: "fas fa-music",
-    color: "#1DB954",
   },
   {
     id: "22",
