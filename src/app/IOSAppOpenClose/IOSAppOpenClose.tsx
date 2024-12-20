@@ -88,10 +88,10 @@ export function IOSAppOpenClose({ apps }: IOSAppOpenCloseProps): ReactNode {
 
       <motion.button
         onClick={onRingButtonClick}
-        className="absolute top-16 left-0 h-10 w-2 bg-black rounded-tr-md rounded-br-md flex items-center justify-center z-20 cursor-pointer"
+        className="absolute top-16 -left-2 h-10 w-4 bg-black rounded-tr-md rounded-br-md flex items-center justify-end z-20 cursor-pointer"
         whileTap={{ x: -2 }}
       >
-        <div className="h-[80%] bg-yellow-800 w-[2px] rounded-md"></div>
+        <div className="h-[80%] bg-yellow-800 w-[2px] mr-1 rounded-md"></div>
       </motion.button>
 
       <div className="relative z-10 grid grid-cols-4 gap-4 items-center content-center p-8 pt-16">
